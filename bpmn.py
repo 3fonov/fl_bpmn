@@ -56,7 +56,14 @@ def make_xml(result):
     # создаем корневые элементы документа
     root = etree.Element("definitions", nsmap=NSMAP)
     collaboration  = etree.SubElement(root,'collaboration',id="Collaboration_1")
-
+     # создаем базовые элементы графического отображения процесса
+    bpmndi_diagram  = etree.SubElement(root,
+                                       "{http://www.omg.org/spec/BPMN/20100524/DI}BPMNDiagram",
+                                id=f'BpmnDiagram_1')
+    bpmndi_plane  = etree.SubElement(bpmndi_diagram,
+                                       "{http://www.omg.org/spec/BPMN/20100524/DI}BPMNPlane",
+                                     bpmnElement=collaboration.get('id'),
+                                id=f'BPMNPlane_1')
     # определяем индексы для идентификаторов элементов
     i = 1
     flow_id=1
@@ -78,14 +85,7 @@ def make_xml(result):
                         name=participant,
                         processRef=f'Process_{i:02d}')
 
-        # создаем базовые элементы графического отображения процесса
-        bpmndi_diagram  = etree.SubElement(root,
-                                           "{http://www.omg.org/spec/BPMN/20100524/DI}BPMNDiagram",
-                                    id=f'BpmnDiagram_{i}')
-        bpmndi_plane  = etree.SubElement(bpmndi_diagram,
-                                           "{http://www.omg.org/spec/BPMN/20100524/DI}BPMNPlane",
-                                         bpmnElement=collaboration.get('id'),
-                                    id=f'BPMNPlane_{i}')
+       
 
         # создаем создаем элемента процесса
         process  = etree.SubElement(root,
@@ -132,7 +132,7 @@ def make_xml(result):
                           "{http://www.omg.org/spec/BPMN/20100524/DI}BPMNLabel")
         etree.SubElement(bpmndi_start_event_label,
                           "{http://www.omg.org/spec/DD/20100524/DC}Bounds", 
-                         x=str(total_width-36), y=str(lane_start+element_center+20),
+                         x=str(total_width-18-35), y=str(lane_start+element_center+20),
                          width='70', height='70')
         total_height += 50
 
@@ -212,12 +212,12 @@ def make_xml(result):
                           "{http://www.omg.org/spec/BPMN/20100524/DI}BPMNLabel")
         etree.SubElement(bpmndi_end_event_label,
                           "{http://www.omg.org/spec/DD/20100524/DC}Bounds", 
-                         x=str(total_width+50), y=str(lane_start+element_center+20),
+                         x=str(total_width+50-18), y=str(lane_start+element_center+20),
                          width='70', height='70'
 
                           )
         # обновляем ширину
-        total_width += 70
+        total_width += 50
         flow_target = end_event.get('id')
 
         # создаем связь до окончания процесса
@@ -233,18 +233,19 @@ def make_xml(result):
                                           id=f'Edge_{edge_id:04d}')
         etree.SubElement(bpmndi_edge,
                                   "{http://www.omg.org/spec/DD/20100524/DI}waypoint",
-                                   x=str(total_width-70),y=str(lane_start+element_center))
+                                   x=str(total_width-50),y=str(lane_start+element_center))
         etree.SubElement(bpmndi_edge,
                                   "{http://www.omg.org/spec/DD/20100524/DI}waypoint",
-                                   x=str(total_width-20),y=str(lane_start+element_center))
+                                   x=str(total_width),y=str(lane_start+element_center))
 
         # устанавливаем высоту и ширину дорожки процесса
         bpmndi_user_plane_bounds.set('height',str(total_height)) 
         bpmndi_user_plane_bounds.set('width',str(total_width)) 
 
         # обновляем счетчики
-        lane_start += total_height+30
+        lane_start += total_height
         total_width = 0
+        total_height = 0
         edge_id+=1
         flow_id += 1
 
