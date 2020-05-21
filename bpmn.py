@@ -135,7 +135,8 @@ def process_line(line,r, current_participant,last_node, current_object):
                     'name':link_name,
                'id': get_id('Flow')}
             p['links'].append(link)
-        return (current_participant,'','') 
+            last_node = task_name
+        return (current_participant,last_node,'') 
     # если строка начинается с FROM, то берем второую половину
     # строки и вытаскиваем из нее объект и задачу на него ссылающуюся
     if line.startswith('FROM'):
